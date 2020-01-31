@@ -66,7 +66,8 @@ function isLogined() {
 
 // 是否是命令消息
 function isCommandMsg(msg) {
-    return msg.type === TIM.TYPES.MSG_TEXT && msg.payload.text.trim().startsWith('.');
+    return msg.type === TIM.TYPES.MSG_TEXT && (msg.payload.text.trim().startsWith('.')
+        || ($("#chatbot-setting-dot").prop("checked") && msg.payload.text.trim().startsWith('。')));
 }
 
 // 接收消息
@@ -133,6 +134,7 @@ $modules.record = {};
     $modules.record.recordMsgIfNeed = (msg) => {
         if (msg.to !== $chatbot.group) return;  // 不是要录制的群，不处理
         if (msg.type !== TIM.TYPES.MSG_TEXT) return;    // 不是文本消息，不处理
+        if ($("#chatbot-setting-filter").prop("checked") && isCommandMsg(msg)) return;  // 设置了过滤指令消息，不处理
         let nickname = msg.nick || msg.from;    // 取发送方昵称
         if (nickname !== lastSpeakerNickname) {
             // 如果不是上一个发言的人，那么要插入昵称
@@ -150,6 +152,8 @@ $modules.record = {};
 <br />
 <span class='content'>${msg.payload.text.trim()}</span>`);
         }
+        // 保存一下 localStorage
+        window.localStorage.setItem("chatbot-record-html", $('#chatbot-chat-history').html().trim());
     }
 
     // 开始记录
@@ -174,9 +178,18 @@ $modules.record = {};
         $('#chatbot-record').removeAttr('disabled');
     });
 
+    // 清空记录
+    $('#chatbot-record-clear').click(() => {
+        console.log("clear record");
+        $('#chatbot-chat-history').html("");
+        window.localStorage.removeItem("chatbot-record-html");
+    });
+
     // 设置 css
     $('#chatbot-css-apply').click(() => {
-        $('#chatbot-css').text($('#chatbot-css-input').val());
+        let css = $('#chatbot-css-input').val();
+        $('#chatbot-css').text(css);
+        window.localStorage.setItem("chatbot-record-css", css);
     });
 
     // 复制为文本
@@ -194,6 +207,36 @@ $modules.record = {};
             return $('#chatbot-chat-history').html().trim() + '<style>' + $('#chatbot-css').text() + '</style>';
         }
     });
+
+    // 提供默认 css
+    const INITIAL_CSS = `.chat-item {
+    padding: 4px;
+}
+    
+.meta {
+    font-weight: bold;
+}
+    
+.chat-user-bot {
+    background-color: #ffffe0;
+}
+
+/* xxx 替换成实际的用户名 */
+.chat-user-xxx {
+    background-color: #e0ffff;
+}`;
+
+    // 恢复 localStorage
+    (function() {
+        let html = window.localStorage.getItem("chatbot-record-html");
+        if (html) {
+            $('#chatbot-chat-history').html(html);
+        }
+        let css = window.localStorage.getItem("chatbot-record-css") || INITIAL_CSS;
+        $('#chatbot-css-input').text(css);
+        $('#chatbot-css').text(css);
+    })();
+
 })();
 $modules.dice = {};
 (function() {

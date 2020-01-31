@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <!-- 优先使用Chrome内核 -->
-  <meta name="renderer" content="webkit"/>
-  <meta name="force-rendering" content="webkit"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="renderer" content="webkit" />
+  <meta name="force-rendering" content="webkit" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>I'm bot</title>
   <!-- <link rel="icon" href="favicon.ico" type="image/x-icon" /> -->
@@ -19,73 +19,106 @@
 
 <body>
   <nav class="navbar navbar-default navbar-static-top">
-      <div class="container-fluid">
-          <!-- Brand and toggle get grouped for better mobile display -->
-          <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                  data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">🎲&nbsp;控制面板</a>
-          </div>
-      </div><!-- /.container-fluid -->
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+          data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">🎲&nbsp;控制面板</a>
+      </div>
+    </div><!-- /.container-fluid -->
   </nav>
   <div class="container-fluid">
-      <div class="row">
-          <div class="col-md-6">
-            <div class="input-group">
-              <span class="input-group-addon" id="basic-addon3">输入骰子昵称</span>
-              <input type="text" id="chatbot-name" class="form-control" value="bot">
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="button" id="chatbot-login">登录</button>
-                <button class="btn btn-default" type="button" disabled="disabled" id="chatbot-logout">登出</button>
-              </span>
-            </div><!-- /input-group -->
-          </div><!-- /.col-lg-6 -->
-          <div class="col-md-6" id="chatbot-login-prompt" style="color:red">登录前请先私聊骰子，若它在线，则可能被别人占用，可以换个骰子登录</div>
-      </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-addon" id="basic-addon3">输入骰子昵称</span>
+          <input type="text" id="chatbot-name" class="form-control" value="bot">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="chatbot-login">登录</button>
+            <button class="btn btn-default" type="button" disabled="disabled" id="chatbot-logout">登出</button>
+          </span>
+        </div><!-- /input-group -->
+      </div><!-- /.col-lg-6 -->
+      <div class="col-md-6" id="chatbot-login-prompt" style="color:red">登录前请先私聊骰子，若它在线，则可能被别人占用，可以换个骰子登录</div>
+    </div>
 
-      <div class="row" style="margin-top:30px">
-          <div class="col-md-6">
-            <div class="input-group">
-              <span class="input-group-addon" id="basic-addon3">输入群ID</span>
-              <input type="text" id="chatbot-group-name" class="form-control" placeholder="可在群的右边栏复制得到">
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="button" id="chatbot-record">开始录制</button>
-                <button class="btn btn-default" type="button" disabled="disabled" id="chatbot-record-stop">结束录制</button>
-                <button class="btn btn-default" type="button" id="chatbot-copy-text">复制为纯文本</button>
-                <button class="btn btn-default" type="button" id="chatbot-copy-html">复制为HTML</button>
-              </span>
-            </div><!-- /input-group -->
-          </div><!-- /.col-lg-6 -->
-          <div class="col-md-6" id="chatbot-record-prompt" style="color:red"></div>
-      </div>
+    <div class="row" style="margin-top:30px">
+      <div class="col-md-12">
+        <div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-default">
+            <input type="checkbox" autocomplete="off" id="chatbot-setting-dot">中文句号可作为指令
+          </label>
+          <label class="btn btn-default">
+            <input type="checkbox" autocomplete="off" id="chatbot-setting-filter">聊天记录过滤玩家指令
+          </label>
+        </div>
+      </div><!-- /.col-lg-6 -->
+    </div>
 
-      <div class="row" style="margin-top:30px">
-        <div class="col-md-8">
-          <div class="panel panel-default">
-            <div class="panel-body" id="chatbot-chat-history" style="min-height:350px">
-            </div>
+    <div class="row" style="margin-top:30px">
+      <div class="col-md-8">
+        <div class="input-group">
+          <span class="input-group-addon" id="basic-addon3">输入群ID</span>
+          <input type="text" id="chatbot-group-name" class="form-control" placeholder="可在群的右边栏复制得到">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="chatbot-record">开始录制</button>
+            <button class="btn btn-default" type="button" disabled="disabled" id="chatbot-record-stop">结束录制</button>
+            <button class="btn btn-default" type="button" id="chatbot-copy-text">复制为纯文本</button>
+            <button class="btn btn-default" type="button" id="chatbot-copy-html">复制为HTML</button>
+            <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#chatbot-record-clear-modal">清空记录</button>
+          </span>
+        </div><!-- /input-group -->
+      </div><!-- /.col-lg-6 -->
+      <div class="col-md-4" id="chatbot-record-prompt" style="color:red"></div>
+    </div>
+
+    <div class="row" style="margin-top:30px">
+      <div class="col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-body" id="chatbot-chat-history" style="min-height:350px">
           </div>
         </div>
-        <div class="col-md-4">
-          <!-- <div class="panel panel-default"> -->
-            <button class="btn btn-default" type="button" id="chatbot-css-apply">应用 CSS</button>
-            <textarea class="form-control" placeholder="在此处输入 CSS 后点击上方按钮以控制聊天记录样式"
-              style="height:300px;margin-top:15px;font-family: consolas, 'Courier New', Courier, monospace" id="chatbot-css-input"></textarea>
-          <!-- </div> -->
+      </div>
+      <div class="col-md-4">
+        <!-- <div class="panel panel-default"> -->
+        <button class="btn btn-default" type="button" id="chatbot-css-apply">应用 CSS</button>
+        <textarea class="form-control" placeholder="在此处输入 CSS 后点击上方按钮以控制聊天记录样式"
+          style="height:300px;margin-top:15px;font-family: consolas, 'Courier New', Courier, monospace"
+          id="chatbot-css-input"></textarea>
+        <!-- </div> -->
+      </div>
+    </div>
+
+  <!-- 删除记录确认框 -->
+  <div class="modal fade" id="chatbot-record-clear-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">警告</h4>
+        </div>
+        <div class="modal-body">
+          确定要清空所有的跑团记录吗？一旦清空将无法找回。
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" id="chatbot-record-clear">确定</button>
         </div>
       </div>
-      
+    </div>
   </div>
+
+  <style id="chatbot-css"></style>
   <script src="tim-js.js"></script>
   <script src="../debug/GenerateTestUserSig.js"></script>
   <script src="../debug/lib-generate-test-usersig.min.js"></script>
   <script src="app.js"></script>
-  <style id="chatbot-css">
-    
-  </style>
 </body>
+
 </html>
