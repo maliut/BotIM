@@ -16,4 +16,5 @@ After the above steps, you should do:
 6. You can copy the group id in admin panel and click *start record* button to record your play logs.
 7. After your game finish, remember to logout the bot (or simply close webpage) so others can use it.
 
- 
+## Android APP
+链接：https://share.weiyun.com/5E1LQgo 密码：xddtsf 
