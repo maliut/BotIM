@@ -67,7 +67,12 @@ function isLogined() {
 // 是否是命令消息
 function isCommandMsg(msg) {
     return msg.type === TIM.TYPES.MSG_TEXT && (msg.payload.text.trim().startsWith('.')
-        || ($("#chatbot-setting-dot").prop("checked") && msg.payload.text.trim().startsWith('。')));
+        || (isChecked('chatbot-setting-dot') && msg.payload.text.trim().startsWith('。')));
+}
+
+// 判断 bootstrap 的 checkbox 是否被选中
+function isChecked(domId) {
+    return $(`#${domId}`).hasClass('active');
 }
 
 // 接收消息
@@ -125,35 +130,42 @@ function _dice(n) {
 }
 // 跑团记录相关逻辑
 $modules.record = {};
-(function () {
+(function() {
 
     // 记录一条消息核心逻辑
-    const historyContainer = $('#chatbot-chat-history');
-    let lastSpeakerNickname = '';   // 上一个说话的人，用于合并会话
-
     $modules.record.recordMsgIfNeed = (msg) => {
         if (msg.to !== $chatbot.group) return;  // 不是要录制的群，不处理
         if (msg.type !== TIM.TYPES.MSG_TEXT) return;    // 不是文本消息，不处理
-        if ($("#chatbot-setting-filter").prop("checked") && isCommandMsg(msg)) return;  // 设置了过滤指令消息，不处理
-        let nickname = msg.nick || msg.from;    // 取发送方昵称
-        if (nickname !== lastSpeakerNickname) {
-            // 如果不是上一个发言的人，那么要插入昵称
-            historyContainer.append(`
-<div class='chat-item chat-user-${nickname}'>
-    <span class='meta'>${nickname}</span>
-    <br />
-    <span class='content'>${msg.payload.text.trim()}</span>
+        if (isChecked('chatbot-setting-filter') && isCommandMsg(msg)) return;  // 设置了过滤指令消息，不处理
+        $('#chatbot-chat-history').append(
+`<div class='chat-item'>
+  <div class="glyphicon glyphicon-move chat-item-handle" aria-hidden="true"></div>
+  <div class='chat-item-name' title='${msg.from}'>${msg.nick || msg.from}</div>\u3000
+  <div class='chat-item-content' title='${msg.time}'>${msg.payload.text}</div>
+  <div class="glyphicon glyphicon-remove chat-item-remove" aria-hidden="true"></div>
 </div>`);
-            lastSpeakerNickname = nickname;
-        } else {
-            let size = historyContainer.children().length;
-            let lastChild = historyContainer.children()[size - 1];
-            $(lastChild).append(`
-<br />
-<span class='content'>${msg.payload.text.trim()}</span>`);
-        }
+        // let nickname = msg.nick || msg.from;    // 取发送方昵称
+        // if (nickname !== lastSpeakerNickname) {
+            // 如果不是上一个发言的人，那么要插入昵称
+//             historyContainer.append(
+// `<div class='chat-item chat-user-${msg.from}'>
+//     <div class='delete-btn'>xx</div>
+//     <div class='meta'>${nickname}</div>
+//     <div class='content'>${msg.payload.text.trim()}
+//         <div class='delete-btn'>x</div>
+//     </div>
+// </div>`);
+//             lastSpeakerNickname = nickname;
+//         // } else {
+//             let size = historyContainer.children().length;
+//             let lastChild = historyContainer.children()[size - 1];
+//             $(lastChild).append(
+// `<div class='content'>${msg.payload.text.trim()}
+//     <div class='delete-btn'>x</div>
+// </div>`);
+        // }
         // 保存一下 localStorage
-        window.localStorage.setItem("chatbot-record-html", $('#chatbot-chat-history').html().trim());
+        _saveRecord();
     }
 
     // 开始记录
@@ -178,6 +190,17 @@ $modules.record = {};
         $('#chatbot-record').removeAttr('disabled');
     });
 
+    // 删除单条记录
+    // 因为记录是动态生成的，所以不能用 click() 方法绑定
+    // 另外由于 this 取值的问题，也不能用箭头函数来写
+    $('#chatbot-chat-history').on('click', '.chat-item-remove', function() {
+        console.log("delete simple");
+        let need2Delete = this.parentElement;
+        need2Delete.parentElement.removeChild(need2Delete);
+        // 保存一下 localStorage
+        _saveRecord();
+    });
+
     // 清空记录
     $('#chatbot-record-clear').click(() => {
         console.log("clear record");
@@ -185,28 +208,14 @@ $modules.record = {};
         window.localStorage.removeItem("chatbot-record-html");
     });
 
-    // 设置 css
-    $('#chatbot-css-apply').click(() => {
-        let css = $('#chatbot-css-input').val();
-        $('#chatbot-css').text(css);
-        window.localStorage.setItem("chatbot-record-css", css);
+    // 记录可拖动
+    new Sortable(document.getElementById('chatbot-chat-history'), {
+        handle: '.chat-item-handle', // handle's class
+        ghostClass: 'chat-item-moving',
+        animation: 150,
+        onUpdate: _saveRecord,  // 拖动完也要保存
     });
 
-    // 复制为文本
-    new ClipboardJS('#chatbot-copy-text', {
-        text: () => {
-            alert('复制成功！');
-            return $('#chatbot-chat-history').text().trim();
-        }
-    });
-
-    // 复制为 html
-    new ClipboardJS('#chatbot-copy-html', {
-        text: () => {
-            alert('复制成功！');
-            return $('#chatbot-chat-history').html().trim() + '<style>' + $('#chatbot-css').text() + '</style>';
-        }
-    });
 
     // 提供默认 css
     const INITIAL_CSS = `.chat-item {
@@ -232,10 +241,13 @@ $modules.record = {};
         if (html) {
             $('#chatbot-chat-history').html(html);
         }
-        let css = window.localStorage.getItem("chatbot-record-css") || INITIAL_CSS;
-        $('#chatbot-css-input').text(css);
-        $('#chatbot-css').text(css);
     })();
+
+    // 将记录保存到 localStorage
+    function _saveRecord() {
+        window.localStorage.setItem("chatbot-record-html", $('#chatbot-chat-history').html());
+    }
+
 
 })();
 $modules.dice = {};
