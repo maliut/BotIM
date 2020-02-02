@@ -4,7 +4,7 @@
 const $modules = {};
 
 // 当前 chatbot
-const $chatbot = {}; 
+const $chatbot = {};
 
 // tim 相关回调
 const $tim = TIM.create({ SDKAppID: SDKAPPID });
@@ -19,13 +19,13 @@ $tim.on(TIM.EVENT.KICKED_OUT, e => {
     $('#chatbot-login-prompt').text('被踢下线，可能因为别人登录了，或是点登录手速太快点了两次，请重新登录');
 });
 $tim.on(TIM.EVENT.SDK_READY, () => console.log("sdk ready"));
-$tim.on(TIM.EVENT.MESSAGE_RECEIVED, function(event) {
+$tim.on(TIM.EVENT.MESSAGE_RECEIVED, function (event) {
     let msgList = event.data;
     for (let i = 0; i < msgList.length; i++) {
         handleMessage(msgList[i]);
     }
 });
- 
+
 // 登录
 $('#chatbot-login').click(() => {
     if (isLogined()) {
@@ -37,7 +37,7 @@ $('#chatbot-login').click(() => {
         $('#chatbot-login-prompt').text('请输入骰子姬的名字');
         return;
     }
-    $tim.login({ userID: name, userSig: genTestUserSig(name).userSig})
+    $tim.login({ userID: name, userSig: genTestUserSig(name).userSig })
         .then(() => {
             $chatbot.name = name;
             $('#chatbot-login-prompt').text('登录成功：' + name);
@@ -83,7 +83,7 @@ function handleMessage(msg) {
             to: msg.from,
             conversationType: TIM.TYPES.CONV_C2C,
             payload: {
-              text: $chatbot.name + "当前在线！"
+                text: $chatbot.name + "当前在线！"
             }
         });
         $tim.sendMessage(echoMsg);
@@ -92,7 +92,7 @@ function handleMessage(msg) {
         if (isCommandMsg(msg)) {
             handleGroupMessage(msg);
         }
-    
+
     }
 }
 
@@ -128,9 +128,35 @@ function sendGroupMessage(gid, string) {
 function _dice(n) {
     return Math.floor(Math.random() * n + 1);
 }
+
+// Date 格式化扩展函数
+Date.prototype.format = function (fmt) { //author: meizz   
+    var o = {
+        "M+": this.getMonth() + 1,                 //月份   
+        "d+": this.getDate(),                    //日   
+        "H+": this.getHours(),                   //小时   
+        "m+": this.getMinutes(),                 //分   
+        "s+": this.getSeconds(),                 //秒   
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度   
+        "S": this.getMilliseconds()             //毫秒   
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}  
+
+// 秒数转化为时间字符串
+function second2str(second) {
+    let d = new Date();
+    d.setTime(second * 1000);
+    return d.format("yyyy-MM-dd HH:mm:ss");
+}
 // 跑团记录相关逻辑
 $modules.record = {};
-(function() {
+(function () {
 
     // 记录一条消息核心逻辑
     $modules.record.recordMsgIfNeed = (msg) => {
@@ -138,32 +164,12 @@ $modules.record = {};
         if (msg.type !== TIM.TYPES.MSG_TEXT) return;    // 不是文本消息，不处理
         if (isChecked('chatbot-setting-filter') && isCommandMsg(msg)) return;  // 设置了过滤指令消息，不处理
         $('#chatbot-chat-history').append(
-`<div class='chat-item'>
+            `<div class='chat-item'>
   <div class="glyphicon glyphicon-move chat-item-handle" aria-hidden="true"></div>
   <div class='chat-item-name' title='${msg.from}'>${msg.nick || msg.from}</div>\u3000
   <div class='chat-item-content' title='${msg.time}'>${msg.payload.text}</div>
   <div class="glyphicon glyphicon-remove chat-item-remove" aria-hidden="true"></div>
 </div>`);
-        // let nickname = msg.nick || msg.from;    // 取发送方昵称
-        // if (nickname !== lastSpeakerNickname) {
-            // 如果不是上一个发言的人，那么要插入昵称
-//             historyContainer.append(
-// `<div class='chat-item chat-user-${msg.from}'>
-//     <div class='delete-btn'>xx</div>
-//     <div class='meta'>${nickname}</div>
-//     <div class='content'>${msg.payload.text.trim()}
-//         <div class='delete-btn'>x</div>
-//     </div>
-// </div>`);
-//             lastSpeakerNickname = nickname;
-//         // } else {
-//             let size = historyContainer.children().length;
-//             let lastChild = historyContainer.children()[size - 1];
-//             $(lastChild).append(
-// `<div class='content'>${msg.payload.text.trim()}
-//     <div class='delete-btn'>x</div>
-// </div>`);
-        // }
         // 保存一下 localStorage
         _saveRecord();
     }
@@ -193,7 +199,7 @@ $modules.record = {};
     // 删除单条记录
     // 因为记录是动态生成的，所以不能用 click() 方法绑定
     // 另外由于 this 取值的问题，也不能用箭头函数来写
-    $('#chatbot-chat-history').on('click', '.chat-item-remove', function() {
+    $('#chatbot-chat-history').on('click', '.chat-item-remove', function () {
         console.log("delete simple");
         let need2Delete = this.parentElement;
         need2Delete.parentElement.removeChild(need2Delete);
@@ -216,13 +222,59 @@ $modules.record = {};
         onUpdate: _saveRecord,  // 拖动完也要保存
     });
 
+    // 导出纯文本
+    $('#chatbot-export-text').click(() => {
+        let lastUser = '';      // 上一个说话人的昵称，用于合并会话
+        const collapse = isChecked('chatbot-record-if-collapse');
+        const inclUserId = isChecked('chatbot-record-if-userid');
+        const inclTime = isChecked('chatbot-record-if-time');
+        let result = '';    // 最终结果
+        $('#chatbot-chat-history').children().each((_, item) => {
+            let user = $(item).children('.chat-item-name').text();
+            if (user !== lastUser || !collapse) {   // 需要显示昵称的场合
+                result += user + (inclUserId ? `(${$(item).children('.chat-item-name').attr('title')}) ` : ' ')
+                    + (inclTime ? second2str(Number($(item).children('.chat-item-content').attr('title'))) : '') + '\n';
+            }
+            result += $(item).children('.chat-item-content').text() + '\n';
+            lastUser = user;
+        });
+        download('text', result);
+    });
+
+    // 导出 html
+    $('#chatbot-export-html').click(() => {
+        let lastUser = '';      // 上一个说话人的昵称，用于合并会话
+        const collapse = isChecked('chatbot-record-if-collapse');
+        const inclUserId = isChecked('chatbot-record-if-userid');
+        const inclTime = isChecked('chatbot-record-if-time');
+        let result = '';    // 最终结果
+        $('#chatbot-chat-history').children().each((_, item) => {
+            let user = $(item).children('.chat-item-name').text();
+            if (user !== lastUser || !collapse) {   // 需要显示昵称的场合
+                if (result !== '') result += '</div>';
+                result += `<div class='chat-item chat-user-${$(item).children('.chat-item-name').attr('title')}'>`
+                    + `<div class='meta'><span class='chat-item-name'>${user}</span>`
+                    + (inclUserId ? `(<span class='chat-item-userid'>${$(item).children('.chat-item-name').attr('title')}</span>) ` : ' ')
+                    + (inclTime ? `<span class='chat-item-time'>${second2str(Number($(item).children('.chat-item-content').attr('title')))}</span>` : '')
+                    + `</div><div class='content'>${$(item).children('.chat-item-content').text()}</div>`;
+            } else {
+                result += `<div class='content'>${$(item).children('.chat-item-content').text()}</div>`;
+            }
+            lastUser = user;
+        });
+        if (result !== '') result += '</div>';
+        // add css
+        result += `<style>${INITIAL_CSS}</style>`;
+        download('html', result);
+    });
+
 
     // 提供默认 css
     const INITIAL_CSS = `.chat-item {
     padding: 4px;
 }
     
-.meta {
+.chat-item-name {
     font-weight: bold;
 }
     
@@ -230,13 +282,27 @@ $modules.record = {};
     background-color: #ffffe0;
 }
 
-/* xxx 替换成实际的用户名 */
+/* xxx 替换成实际的 userid */
 .chat-user-xxx {
     background-color: #e0ffff;
 }`;
 
+    // 导出 json
+    $('#chatbot-export-json').click(() => {
+        let result = [];
+        $('#chatbot-chat-history').children().each((_, item) => {
+            result.push({
+                userid: $(item).children('.chat-item-name').attr('title'),
+                nick: $(item).children('.chat-item-name').text(),
+                time: Number($(item).children('.chat-item-content').attr('title')),
+                content: $(item).children('.chat-item-content').text()
+            });
+        });
+        download('json', JSON.stringify(result));
+    });
+
     // 恢复 localStorage
-    (function() {
+    (function () {
         let html = window.localStorage.getItem("chatbot-record-html");
         if (html) {
             $('#chatbot-chat-history').html(html);
@@ -246,6 +312,18 @@ $modules.record = {};
     // 将记录保存到 localStorage
     function _saveRecord() {
         window.localStorage.setItem("chatbot-record-html", $('#chatbot-chat-history').html());
+    }
+
+    // 将字符串作为文件下载
+    // type: text/html/json
+    function download(type, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', `data:${type}/plain;charset=utf-8,` + encodeURIComponent(text));
+        element.setAttribute('download', `log.${type === 'text' ? 'txt' : type}`);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
     }
 
 
