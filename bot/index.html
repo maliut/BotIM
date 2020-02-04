@@ -93,97 +93,127 @@
             </div>
           </div>
           <div class="col-md-4 margin-top-half">
-              <div class="row">
-                  <button type="button" class="btn btn-default" data-toggle="button" aria-pressed="false" autocomplete="off"
-                  id="chatbot-setting-filter" title="开启后，如[.d100]等触发指令的消息将不被录制">聊天记录过滤玩家指令
-                </button>
-              </div>
-              <div class="row margin-top-half">
-                  <div class="input-group">
-                      <span class="input-group-addon" id="basic-addon3">导出文本/HTML时</span>
-                      <!-- <input type="text" id="chatbot-group-name" class="form-control" placeholder="可在群的右边栏复制得到"> -->
-                      <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" data-toggle="button" aria-pressed="false" 
-                          autocomplete="off" id="chatbot-record-if-collapse">合并连续消息</button>
-                        <button class="btn btn-default" type="button" data-toggle="button" aria-pressed="false" 
-                          autocomplete="off" id="chatbot-record-if-userid">包含UserID</button>
-                        <button class="btn btn-default" type="button" data-toggle="button" aria-pressed="false" 
-                          autocomplete="off" id="chatbot-record-if-time">包含时间</button>
-                      </span>
-                    </div><!-- /input-group -->
-              </div>
+            <div class="row">
+              <button type="button" class="btn btn-default" data-toggle="button" aria-pressed="false" autocomplete="off"
+                id="chatbot-setting-filter" title="开启后，如[.d100]等触发指令的消息将不被录制">聊天记录过滤玩家指令
+              </button>
+            </div>
+            <div class="row margin-top-half">
+              <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">导出文本/HTML时</span>
+                <!-- <input type="text" id="chatbot-group-name" class="form-control" placeholder="可在群的右边栏复制得到"> -->
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button" data-toggle="button" aria-pressed="false"
+                    autocomplete="off" id="chatbot-record-if-collapse">合并连续消息</button>
+                  <button class="btn btn-default" type="button" data-toggle="button" aria-pressed="false"
+                    autocomplete="off" id="chatbot-record-if-userid">包含UserID</button>
+                  <button class="btn btn-default" type="button" data-toggle="button" aria-pressed="false"
+                    autocomplete="off" id="chatbot-record-if-time">包含时间</button>
+                </span>
+              </div><!-- /input-group -->
+            </div>
           </div>
         </div>
 
       </div>
     </div>
+  </div>
 
-    <!-- 删除记录确认框 -->
-    <div class="modal fade" id="chatbot-record-clear-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">警告</h4>
-          </div>
-          <div class="modal-body">
-            确定要清空所有的跑团记录吗？一旦清空将无法找回。
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal" id="chatbot-record-clear">确定</button>
-          </div>
+  <nav class="m-bottom-bar">
+    <div class="container">
+        © 2020 maliut | <a href="https://github.com/maliut/BotIM/issues" target="_blank">我要提建议！</a>
+    </div>
+  </nav>
+
+  <!-- 删除记录确认框 -->
+  <div class="modal fade" id="chatbot-record-clear-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">警告</h4>
+        </div>
+        <div class="modal-body">
+          确定要清空所有的跑团记录吗？一旦清空将无法找回。
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" id="chatbot-record-clear">确定</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <style>
-      .margin-top {
-        margin-top: 30px;
-      }
+  <style>
+    .margin-top {
+      margin-top: 30px;
+    }
 
-      .margin-top-half {
-        margin-top: 15px;
-      }
+    .margin-top-half {
+      margin-top: 15px;
+    }
 
-      .chat-item {
-        display: flex;
-        padding: 5px 0;
-      }
+    .chat-item {
+      display: flex;
+      padding: 5px 0;
+    }
 
-      .chat-item-moving {
-        background: rgb(238, 238, 238);
-      }
+    .chat-item-moving {
+      background: rgb(238, 238, 238);
+    }
 
-      .chat-item-name {
-        flex-shrink: 0;
-        font-weight: bold;
-      }
+    .chat-item-name {
+      flex-shrink: 0;
+      font-weight: bold;
+    }
 
-      .chat-item>.chat-item-handle {
-        cursor: grab;
-        color: transparent;
-      }
+    .chat-item>.chat-item-handle {
+      cursor: grab;
+      color: transparent;
+    }
 
-      .chat-item:hover>.chat-item-handle {
-        color: black;
-      }
+    .chat-item:hover>.chat-item-handle {
+      color: black;
+    }
 
-      .chat-item>.chat-item-remove {
-        margin-left: auto;
-        cursor: pointer;
-        color: transparent;
-      }
+    .chat-item>.chat-item-remove {
+      margin-left: auto;
+      cursor: pointer;
+      color: transparent;
+    }
 
-      .chat-item:hover>.chat-item-remove {
-        color: red;
-      }
-    </style>
-    <script src="tim-js.js"></script>
-    <script src="../debug/GenerateTestUserSig.js"></script>
-    <script src="../debug/lib-generate-test-usersig.min.js"></script>
-    <script src="app.js"></script>
+    .chat-item:hover>.chat-item-remove {
+      color: red;
+    }
+
+    .m-bottom-bar {
+      position: relative;
+      min-height: 50px;
+      border-top: 1px solid #e7e7e7;
+      background-color: #f8f8f8;
+      padding: 10px 0;
+    }
+
+    .m-bottom-bar .container {
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .m-bottom-bar a {
+      color: #777;
+    }
+
+    .m-bottom-bar a:hover {
+      text-decoration: none;
+      cursor: pointer;
+      color: #f59200;
+    }
+  </style>
+  <script src="tim-js.js"></script>
+  <script src="../debug/GenerateTestUserSig.js"></script>
+  <script src="../debug/lib-generate-test-usersig.min.js"></script>
+  <script src="app.js"></script>
 </body>
 
 </html>
