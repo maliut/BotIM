@@ -1,3 +1,7 @@
+**NOTE: This project is no longer maintained.**
+
+本项目已不再维护，强烈建议大家转移到更完善、功能更强大的新版本 [paotuan.github.io](https://github.com/paotuan)
+
 # BotIM
 IM with bot for COC/DND and other usages
 
